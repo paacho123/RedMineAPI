@@ -1,0 +1,79 @@
+Index: app/views/issues/index.api.rsb
+===================================================================
+--- app/views/issues/index.api.rsb	(revision 12735)
++++ app/views/issues/index.api.rsb	(working copy)
+@@ -30,6 +30,8 @@
+           api.relation(:id => relation.id, :issue_id => relation.issue_from_id, :issue_to_id => relation.issue_to_id, :relation_type => relation.relation_type, :delay => relation.delay)
+         end
+       end if include_in_api_response?('relations')
++
++      call_hook(:view_issues_index_api, :issue => issue)
+     end
+   end
+ end
+Index: app/views/issues/show.api.rsb
+===================================================================
+--- app/views/issues/show.api.rsb	(revision 12735)
++++ app/views/issues/show.api.rsb	(working copy)
+@@ -71,4 +71,6 @@
+       api.user :id => user.id, :name => user.name
+     end
+   end if include_in_api_response?('watchers') && User.current.allowed_to?(:view_issue_watchers, @issue.project)
++
++  call_hook(:view_issues_show_api, :issue => @issue)
+ end
+Index: app/views/timelog/index.api.rsb
+===================================================================
+--- app/views/timelog/index.api.rsb	(revision 12735)
++++ app/views/timelog/index.api.rsb	(working copy)
+@@ -13,6 +13,8 @@
+       api.updated_on time_entry.updated_on
+ 
+       render_api_custom_values time_entry.custom_field_values, api
++
++      call_hook(:view_timelog_index_api, :time_entry => time_entry)
+     end
+   end
+ end
+Index: app/views/timelog/show.api.rsb
+===================================================================
+--- app/views/timelog/show.api.rsb	(revision 12735)
++++ app/views/timelog/show.api.rsb	(working copy)
+@@ -11,4 +11,6 @@
+   api.updated_on @time_entry.updated_on
+ 
+   render_api_custom_values @time_entry.custom_field_values, api
++
++  call_hook(:view_timelog_show_api, :time_entry => @time_entry)
+ end
+Index: app/views/users/index.api.rsb
+===================================================================
+--- app/views/users/index.api.rsb	(revision 12735)
++++ app/views/users/index.api.rsb	(working copy)
+@@ -10,6 +10,8 @@
+       api.last_login_on user.last_login_on
+ 
+       render_api_custom_values user.visible_custom_field_values, api
++
++      call_hook(:view_users_index_api, :user => user)
+     end
+   end
+ end
+Index: app/views/users/show.api.rsb
+===================================================================
+--- app/views/users/show.api.rsb	(revision 12735)
++++ app/views/users/show.api.rsb	(working copy)
+@@ -28,10 +28,12 @@
+               attrs = {:id => member_role.role.id, :name => member_role.role.name}
+               attrs.merge!(:inherited => true) if member_role.inherited_from.present?
+               api.role attrs
+-            end 
++            end
+           end
+         end
+       end if membership.project
+     end
+   end if include_in_api_response?('memberships') && @memberships
++
++  call_hook(:view_users_show_api, :user => @user)
+ end
